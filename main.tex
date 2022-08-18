@@ -2,7 +2,7 @@
 % @Author: WU Zihan
 % @Date:   2018-02-28 19:42:22
 % @Last Modified by:   WU Zihan
-% @Last Modified time: 2022-08-18 17:10:36
+% @Last Modified time: 2022-08-18 17:31:03
 \PassOptionsToPackage{quiet}{fontspec}
 \documentclass[UTF8]{ctexart}
 \usepackage{graphicx} 
@@ -70,6 +70,7 @@
 \begin{theorem}
     给定Hash次数$N$, 所生成的权重$W(N)$, 作为一个随机变量, 其期望与具体生成区块的种类无关, 且有
     \[ {\rm {E}}(W(N)) = N \]
+    \label{weight}
 \end{theorem}
 \begin{proof}
     $N$次的Hash是分配在各类区块上的. 由于$G$是有限大小的, $|\{\mathcal{B}_k\}|\in \mathbb{N}$, 记为$k_{\rm max}$.
@@ -111,7 +112,32 @@ $\forall\omega\notin\{{\rm E}(W_h)-W_h>\cfrac{\Delta}{2}\} \cup \{W_a-{\rm E}(W_
 
 下面我们证明Theorem \ref{safethm}:
 \begin{proof}
-    由Lemma \ref{lem}
+    由Lemma \ref{lem},
+    \begin{align*}
+        {\rm P}(A) \le {\rm P}(\{{\rm E}(W_h)-W_h>\cfrac{\Delta}{2}\} \cup \{W_a-{\rm E}(W_a)>\cfrac{\Delta}{2}\}) \\ \le 
+    {\rm P}({\rm E}(W_h)-W_h>\cfrac{\Delta}{2})+{\rm P}(W_a-{\rm E}(W_a)>\cfrac{\Delta}{2}) \\ 
+    \le {\rm P}(|{\rm E}(W_h)-W_h|>\cfrac{\Delta}{2})+{\rm P}(|W_a-{\rm E}(W_a)|>\cfrac{\Delta}{2}).
+    \end{align*}
+    由切比雪夫不等式, 
+    \begin{align*}
+        {\rm P}(A) &\le \cfrac{{\rm Var}(W_h)}{(\Delta/2)^2} + \cfrac{{\rm Var}(W_a)}{(\Delta/2)^2} \\ 
+        &=  \cfrac{4({\rm Var}(W_h)+{\rm Var}(W_a))}{\Delta^2}
+        % &= \cfrac{4({\rm Var}(W_h)+{\rm Var}(W_a))}{\Delta^2}
+    \end{align*}
+    而对于$\Delta$, 由Theorem \ref{weight}
+    \[\Delta = {\rm E}(W_h)-{\rm E}(W_a) = N_h - N_a = v_ht-qv_ht=(1-q)v_ht.\]
+    记$f(t) = \cfrac{4({\rm Var}(W_h)+{\rm Var}(W_a))}{[(1-q)v_ht]^2}$, 
+    注意到
+    \[f(t) \sim \cfrac{1}{t^2},\]
+    则显然有
+    \[\lim_{t\rightarrow \infty}f(t) = 0.\]
+    也即
+    $\forall \epsilon>0, \exists T>0$, s.t. $\forall t>T$, 都有
+    \[|f(t)-0|<\epsilon.\]
+    此时
+    \[{\rm P}(F) < \epsilon,\]
+    % \[{\rm P}(A) \le {\rm P}(\{{\rm E}(W_h)-W_h>\cfrac{\Delta}{2}\} \cup \{W_a-{\rm E}(W_a)>\cfrac{\Delta}{2}\}) \le 
+    % {\rm P}((W_h)-W_h>\cfrac{\Delta}{2})+{\rm P}(W_a-{\rm E}(W_a)>\cfrac{\Delta}{2})\]
 \end{proof}
 
 
