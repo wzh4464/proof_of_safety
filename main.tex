@@ -2,7 +2,7 @@
 % @Author: WU Zihan
 % @Date:   2018-02-28 19:42:22
 % @Last Modified by:   WU Zihan
-% @Last Modified time: 2022-08-18 15:31:41
+% @Last Modified time: 2022-08-18 17:10:36
 \PassOptionsToPackage{quiet}{fontspec}
 \documentclass[UTF8]{ctexart}
 \usepackage{graphicx} 
@@ -29,7 +29,8 @@
 \newtheorem*{assumption}{Assumption}
 \newtheorem*{corollary}{Corollary}
 \theoremstyle{plain}
-\newtheorem{thm}{Theorem}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
 % \newtheorem{assumption}{Assumption}
 \title{Proof of safety}
 \author{Zihan}
@@ -66,10 +67,10 @@
 \section{权重与Hash次数的关系}
 对于Hash次数和所生成的权重, 我们有以下定理:
 
-\begin{thm}
+\begin{theorem}
     给定Hash次数$N$, 所生成的权重$W(N)$, 作为一个随机变量, 其期望与具体生成区块的种类无关, 且有
     \[ {\rm {E}}(W(N)) = N \]
-\end{thm}
+\end{theorem}
 \begin{proof}
     $N$次的Hash是分配在各类区块上的. 由于$G$是有限大小的, $|\{\mathcal{B}_k\}|\in \mathbb{N}$, 记为$k_{\rm max}$.
     于是有
@@ -85,9 +86,36 @@
 \end{proof}
 
 \section{诚实者和攻击者}
-攻击者若想篡夺主视图, 其首sibling 权重应当大于主视图的首sibling 权重. 
+记事件攻击者篡夺成功为事件$F$. 攻击者若想篡夺主视图, 其首sibling 权重应当大于主视图的首sibling 权重. 
+即\[F=\{W_a>W_h+W_0\}.\]
+此时, 我们有如下的安全定理:
+\begin{theorem}
+    $\forall \epsilon>0, \exists T>0$, s.t. $\forall t>T$,
+    \[{\rm P}(F) <\epsilon .\]
+    \label{safethm}
+\end{theorem}
+先证明一个引理:
+\begin{lemma}
+    若记$\Delta = {\rm E}(W_h)-{\rm E}(W_a)$, 则进一步有
+\[F\subseteq \{{\rm E}(W_h)-W_h>\cfrac{\Delta}{2}\} \cup \{W_a-{\rm E}(W_a)>\cfrac{\Delta}{2}\}.\]
+\label{lem}
+\end{lemma}
+
+\begin{proof}
+$\forall\omega\notin\{{\rm E}(W_h)-W_h>\cfrac{\Delta}{2}\} \cup \{W_a-{\rm E}(W_a)>\cfrac{\Delta}{2}\}$, 有
+\[\omega\in \{{\rm E}(W_h)-W_h\le\cfrac{\Delta}{2}\} \cap \{W_a-{\rm E}(W_a)\le\cfrac{\Delta}{2}\}.\] 此时
+\[{\rm E}(W_h)-W_h+W_a-{\rm E}(W_a)\le\Delta,\]即
+\[W_a-W_h \le \Delta - {\rm E}(W_h)-{\rm E}(W_a)= 0 \]
+于是\[\omega \notin F,\] 也即\[F \subseteq \{{\rm E}(W_h)-W_h>\cfrac{\Delta}{2}\} \cup \{W_a-{\rm E}(W_a)>\cfrac{\Delta}{2}\}.\]
+\end{proof}
+
+下面我们证明Theorem \ref{safethm}:
+\begin{proof}
+    由Lemma \ref{lem}
+\end{proof}
 
 
+% (1-q)v_h t
 % 和其他文献一样，我们把生成同一种区块的Hash过程视作一个参数为$p$的Poisson过程，其中$p$也是单次Hash生成区块的概率。
 % 则若记$M$为
 % 则若记$N$为生成一个区块所进行的Hash次数，$N$作为一个随机变量，满足参数为$p$的几何分布. 即
