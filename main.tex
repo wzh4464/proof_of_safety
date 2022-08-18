@@ -1,8 +1,9 @@
-%xetex
+%!TEX TS-program = xelatex
 % @Author: WU Zihan
 % @Date:   2018-02-28 19:42:22
 % @Last Modified by:   WU Zihan
-% @Last Modified time: 2022-08-14 00:20:45
+% @Last Modified time: 2022-08-18 15:31:41
+\PassOptionsToPackage{quiet}{fontspec}
 \documentclass[UTF8]{ctexart}
 \usepackage{graphicx} 
 \usepackage[namelimits]{amsmath} %数学公式
@@ -14,14 +15,22 @@
 \usepackage{amsthm}
 \usepackage{listings}
 \usepackage{appendix}
+\usepackage{silence}
+\WarningsOff[latexfont]
 \newenvironment{mymathfrac}[2]%
 {\hbox{$#1$}\! \left/ \! \hbox{$#2$}\right.}
 
 \lstset{breaklines}%自动将长的代码行换行排版
 \lstset{extendedchars=false}%解决代码跨页时，章节标题，页眉等汉字不显示的问题
 
-\newtheorem{Theorem Femat}{Lemma}
-
+% \newtheorem{Theorem Femat}{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem*{assumption}{Assumption}
+\newtheorem*{corollary}{Corollary}
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}
+% \newtheorem{assumption}{Assumption}
 \title{Proof of safety}
 \author{Zihan}
 \date{\today}
@@ -31,26 +40,80 @@
 \section{Preliminary}
 我们考察一种情形，攻击者的算力与诚实者算力之比为$q \in [0,1)$. 但是在此之前，我们先对算力与权重的关系进行一些分析。
 
-\paragraph{期望Hash次数}
+\subsection{一些定义和假设}
+\begin{definition}
+    Let $B\in G$ be a block. 称 $B$为一个 $2^k$-block, 若其所在的 Sibling Group 有 $2^k$ 个区块. 
+所有的$2^k$-block构成的集合记为$\mathcal{B}_k$.
+\end{definition}
 
-和其他文献一样，我们把生成同质区块数目随Hash次数的变化视作一个参数为$p$的Poisson过程，其中$p$也是单次Hash生成区块的概率。
-则若记$N$为生成一个区块所进行的Hash次数，$N$作为一个随机变量，满足参数为$p$的几何分布. 即
-\[N \sim G(p).\]
-对其期望与方差，我们有如下结论：
-\[\text{E}(N)=\frac{1}{p};\]
-\[\text{var}(N) = \cfrac{1-p}{p^2}.\]
 
-特别地，对某一个单块，$p = 1/2^m,$ 其中 $m$ 代表 leading zero 的数目.
+% 称block $B$为一个 $2^k$-block, 若其所在的 Sibling Group 有 $2^k$ 个区块. 
+% 所有的$2^k$-block构成的集合记为$\mathcal{B}_k$.
 
-考察某Block $B$, 若其所在的 Sibling Group 有 $2^k$ 个区块，则我们称 $B$ 为一个 $2^k$-block. 由于$2^k$-block 的
-实际leading zero数目为$m-k$, 所以其对应的 $p$ 有
-\[p = \cfrac{1}{2^{m-k}}.\]
-于是，若记$N_k$为生成一个$2^k$-block所进行的Hash次数，我们有
-$$n_k\equiv\text{E}(N_k)=\cfrac{1}{\frac{1}{2^{m-k}}}=2^{m-k}.$$
+% 记$a_l$为
 
-如前所述，我们定义了一个$2^k$-block的权重$W_k$为
-\[W_k=2^{m-k}.\]
-因此我们可以定义
+% \subsection{期望Hash次数}
+\begin{assumption}
+    和其他文献一样, 我们把生成同一种区块的Hash过程视作一个Poisson过程. 具体来说, 若在$\mathcal{B}_k$上进行$N$次Hash, 记此时生成的$2^k$-block
+    数目为$a_k(N)$, 则$a_k(N)$是一个强度为$2^kp$的Poisson过程, 其中$p$是Mining Difficulty.
+\end{assumption}
+\begin{corollary}
+    由Poisson过程, ${\rm E}(a_k(N)) = 2^k p N$.
+\end{corollary}
+生成的每个$2^k$-块的权重$W_k$设定为$W_k = \cfrac{1}{2^k p}$, 且记诚实者算力为$v_h$.
+
+
+\section{权重与Hash次数的关系}
+对于Hash次数和所生成的权重, 我们有以下定理:
+
+\begin{thm}
+    给定Hash次数$N$, 所生成的权重$W(N)$, 作为一个随机变量, 其期望与具体生成区块的种类无关, 且有
+    \[ {\rm {E}}(W(N)) = N \]
+\end{thm}
+\begin{proof}
+    $N$次的Hash是分配在各类区块上的. 由于$G$是有限大小的, $|\{\mathcal{B}_k\}|\in \mathbb{N}$, 记为$k_{\rm max}$.
+    于是有
+    \[N = N_1 + N_2 + \dots + N_{k_{\rm max}},\] 其中 $N_k (1 \le k \le k_{\rm max})$ 表示在$2^k$-block上($\mathcal{B}_k$)上的Hash次数.
+    Analogously, 权重$W(N)$ 亦有
+    \[W(N) = W_1(N_1) + W_2(N_2) + \dots + W_{k_{\rm max}}(N_{k_{\rm max}}).\]
+    考虑$\mathcal{B}_k$上的$W_k(N)$, 由于所有生成的块, 根据算法, 都为首 sibling group 贡献了权重, 所以$\mathcal{B}_k$上所提供的权重
+    \[W_k(N) = a_k(N)W_k = \cfrac{a_k(N)}{2^k p},\]所以有
+    \[{\rm E}(W_k(N))=\cfrac{{\rm E}(a_k(N))}{2^k p} = \cfrac{2^k p N}{2^k p} = N.\]
+    所以总权重期望有
+    \[ {\rm {E}}(W(N)) ={\rm {E}}\left(\sum_{1 \le k \le k_{\rm max}} W_k(N_k)\right) =\sum_{1 \le k \le k_{\rm max}} {\rm {E}}(W_k(N_k))\]
+    \[= \sum_{1 \le k \le k_{\rm max}}N_k = N\]
+\end{proof}
+
+\section{诚实者和攻击者}
+攻击者若想篡夺主视图, 其首sibling 权重应当大于主视图的首sibling 权重. 
+
+
+% 和其他文献一样，我们把生成同一种区块的Hash过程视作一个参数为$p$的Poisson过程，其中$p$也是单次Hash生成区块的概率。
+% 则若记$M$为
+% 则若记$N$为生成一个区块所进行的Hash次数，$N$作为一个随机变量，满足参数为$p$的几何分布. 即
+% \[N \sim G(p).\]
+% 对其期望与方差，我们有如下结论：
+% \[\text{E}(N)=\frac{1}{p};\]
+% \[\text{var}(N) = \cfrac{1-p}{p^2}.\]
+
+% 特别地，
+% 对某一个单块，$p = 1/2^m,$ 其中 $m$ 代表 leading zero 的数目.
+
+% 考察某Block $B$, 若其所在的 Sibling Group 有 $2^k$ 个区块，则我们称 $B$ 为一个 $2^k$-block. 
+
+% 由于$2^k$-block 的实际leading zero数目为$m-k$, 所以其对应的 $p$ 有
+% \[p = \cfrac{1}{2^{m-k}}.\]
+
+% 若在$\mathcal{B}_k$上Hash了$M_k$次, 记生成$2^k$-block 的数目是$a_k$, 则有
+% \[a_k \sim Poisson(p)\]
+
+% 于是，若记$N_k$为生成一个$2^k$-block所进行的Hash次数，我们有
+% $$n_k\equiv\text{E}(N_k)=\cfrac{1}{\frac{1}{2^{m-k}}}=2^{m-k}.$$
+
+% 如前所述，我们定义了一个$2^k$-block的权重$W_k$为
+% \[W_k=2^{m-k}.\]
+% 因此我们可以定义
+
 
 \end{document}
 
