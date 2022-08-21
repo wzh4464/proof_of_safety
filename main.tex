@@ -2,7 +2,7 @@
 % @Author: WU Zihan
 % @Date:   2018-02-28 19:42:22
 % @Last Modified by:   WU Zihan
-% @Last Modified time: 2022-08-21 11:19:52
+% @Last Modified time: 2022-08-21 11:22:07
 \PassOptionsToPackage{quiet}{fontspec}
 \documentclass[UTF8]{ctexart}
 \usepackage{graphicx} 
@@ -41,7 +41,7 @@
 \section{Preliminary}
 我们考察一种情形，攻击者的算力与诚实者算力之比为$q \in [0,1)$. 但是在此之前，我们先对算力与权重的关系进行一些分析。
 
-% \subsection{一些定义和假设}
+% % \subsection{一些定义和假设}
 \begin{definition}
     Let $B\in G$ be a block. 称 $B$为一个 $2^k$-block, 若其所在的 Sibling Group 有 $2^k$ 个区块. 
 所有的$2^k$-block构成的集合记为$\mathcal{B}_k$.
@@ -70,6 +70,8 @@
 \begin{theorem}
     给定Hash次数$N$, 所生成的权重$W(N)$, 作为一个随机变量, 其期望与具体生成区块的种类无关, 且有
     \[ {\rm {E}}(W(N)) = N \]
+    \[ {\rm {Var}}(W(N)) \leq \cfrac{N}{p}\]
+    % 其中$k_{\max} = |\{\mathcal{B}_k\}|.$
     \[ {\rm {Var}}(W(N)) \leq \cfrac{N}{p}\]
     % 其中$k_{\max} = |\{\mathcal{B}_k\}|.$
     \label{weight}
